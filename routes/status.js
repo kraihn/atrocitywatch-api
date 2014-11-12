@@ -13,9 +13,24 @@ router.get('/', function (req, res) {
 	var atrocities = [];
 
 	// getting atrocities
-	models.sequelize.query("SELECT * FROM Atrocities WHERE earth_box("+lat+", "+lng+", "+radius+") @> ll_to_earth(Atrocities.latitude, Atrocities.longitude);").success(function(results){
-		status = "danger";
-		atrocities = results;
+	// models.Atrocity.find({
+	// 	where: [
+	// 		"earthbox("+lat+", "+lng+", "+radius+") @> ll_to_earth(latitude, longitude)"
+	// 	]
+	// }).success(function(results){
+	// 	status = "danger";
+	// 	atrocities = results.dataValues;
+	// });
+	models.Atrocity.find({
+		where: {
+			type: 'shooting'
+		}
+	}).success(function(results){
+		console.log(results);
+		if(results != null){
+			status = "danger";
+			atrocities = results.dataValues;
+		}
 	});
 
 	res.send({
