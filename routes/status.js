@@ -5,38 +5,21 @@ var router = express.Router();
 /* GET users listing. */
 router.get('/', function (req, res) {
 
-	var lat = req.query.lat;
-	var lng = req.query.lng;
-	var radius = 1;
+  var lat = req.query.lat;
+  var lng = req.query.lng;
+  var radius = 1; // miles
 
-	var status = "safe";
-	var atrocities = [];
-
-	// getting atrocities
-	// models.Atrocity.find({
-	// 	where: [
-	// 		"earthbox("+lat+", "+lng+", "+radius+") @> ll_to_earth(latitude, longitude)"
-	// 	]
-	// }).success(function(results){
-	// 	status = "danger";
-	// 	atrocities = results.dataValues;
-	// });
-	models.Atrocity.find({
-		where: {
-			type: 'shooting'
-		}
-	}).success(function(results){
-		console.log(results);
-		if(results != null){
-			status = "danger";
-			atrocities = results.dataValues;
-		}
-	});
-
-	res.send({
-		status: status,
-		atrocities: atrocities
-	});
+  // getting atrocities
+  models.Atrocity.findAll({
+    where: [
+      "earth_box(ll_to_earth(" + lat + ", " + lng + "), " + radius + ") @> ll_to_earth(latitude, longitude)"
+    ]
+  }).success(function (atrocities) {
+    res.send({success: true, safe: (atrocities && atrocities.length > 0 ? false : true), atrocities: atrocities || []});
+  })
+    .error(function (error) {
+      res.send(400);
+    });
 
 });
 
