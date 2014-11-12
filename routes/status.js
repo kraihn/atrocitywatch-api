@@ -10,17 +10,12 @@ router.get('/', function (req, res) {
 	var radius = 1;
 
 	var status = "safe";
-	var atrocities = [
-		{
-			"latitude" : 64.49501,
-			"longitude" : 33.12924,
-			"description": "Shooting"
-		}
-	];
+	var atrocities = [];
 
 	// getting atrocities
-	models.sequelize.query("SELECT * FROM Atrocities WHERE earth_box(64.49501, 33.12924, 25) @> ll_to_earth(Atrocities.latitude, Atrocities.longitude);").success(function(atrocities){
-		status = "false";
+	models.sequelize.query("SELECT * FROM Atrocities WHERE earth_box("+lat+", "+lng+", "+radius+") @> ll_to_earth(Atrocities.latitude, Atrocities.longitude);").success(function(results){
+		status = "danger";
+		atrocities = results;
 	});
 
 	res.send({
