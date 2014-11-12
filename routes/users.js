@@ -5,8 +5,17 @@ var router = express.Router();
 // Get users in hotspot
 router.get('/', function (req, res) {
   if (req.query && (req.query.lat && req.query.lng)) {
-    // TODO: get users
-    res.send({success: true})
+    models.User.findAll({
+      where: [
+        "earth_box(ll_to_earth(" + req.query.lat + ", " + req.query.lng + "), " + 1 + ") @> ll_to_earth(latitude, longitude)"
+      ]
+    })
+      .success(function (users) {
+        res.send({success: true, users: users || []});
+      })
+      .error(function (error) {
+        res.send(400);
+      });
   }
   else {
     res.send(400, {success: false});
